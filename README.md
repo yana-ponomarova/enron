@@ -48,5 +48,10 @@ path_mentee =  "/src/mentee.txt" - relative path to  coma-separated list of ment
 Outputs created 
 path_result = "/Result/result.csv" - file describing top 5 mentors
 
+3) If you want to run the webapp, go here http://193.70.6.96:8000/
+or, for a local installation, 
+-install Django https://docs.djangoproject.com/fr/1.11/topics/install/
+- got to ./webapp
+- run $ python manage.py runserver
 
 
