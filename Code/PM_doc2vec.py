@@ -139,22 +139,6 @@ def PhraseExtractor(message):
 
 # COMMAND ----------
 
-def prep_text(text):
-        """
-		Cleans text from punctuation and numbers
-		Args:
-				(str) text
-		Returns:
-				(str) cleaned text
-		"""
-		not_alphabet_regex = u"[^a-zA-Z]"
-		cleaned_text = re.sub(not_alphabet_regex, " ", text)
-		cleaned_text_token = nltk.word_tokenize(cleaned_text)
-		cleaned_text_token2 = [normalise(w) for w in cleaned_text_token if acceptable_word(w)]
-		return cleaned_text_token2
-
-# COMMAND ----------
-
 def decode_idf(vocab, v):
 		v2 = v.toArray()
 		v3 = [(vocab[i], v.toArray()[i]) for i in range(0,len(v.toArray())) if v.toArray()[i] > 0]
