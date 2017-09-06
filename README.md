@@ -43,11 +43,10 @@ path_data = "/Data/mail-2015.avro" - relative path to the avro datasource
 path_stopwords = "/src/stopwords_eng.txt" - relative path to stopwords file
 path_firstnames = "/src/CSV_Database_of_First_Names.csv" - relative path to first names file
 path_lastnames = "/src/CSV_Database_of_Last_Names.csv" - relative path to last names file
-
+path_mentee =  "/src/mentee.txt" - relative path to  coma-separated list of mentee interests
 
 Outputs created 
-path_model = "/Model/doc2vec_model3.txt" - doc2vec model that will be used by mentor_predict.py
-path_emails_rescaled_byauthor = '/src/emails_rescaled_byauthor' -Enron employees competencies as vectors, to be used by mentor_predict.py
-path_docs = "/src/docs.csv" -doc2vec model that will be used by mentor_predict.py - corpus restructured, to be used by mentor_predict.py
+path_result = "/Result/result.csv" - file describing top 5 mentors
+
 
 
