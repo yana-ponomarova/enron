@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="https://getbootstrap.com/favicon.ico">
+
+    <title>Signin Template for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="https://getbootstrap.com/docs/4.0/examples/signin/signin.css" rel="stylesheet">
+
+    <script>
+    var skills_selected= [];
+    function Collect() {
+      var skills_selected= [];
+    	var skill1 = document.getElementById("skill1").value
+      var skill2 = document.getElementById("skill2").value
+      var skill3 = document.getElementById("skill3").value
+      var skill4 = document.getElementById("skill4").value
+      var skill5 = document.getElementById("skill5").value
+      skills_selected.push(skill1)
+      skills_selected.push(skill2)
+      skills_selected.push(skill3)
+      skills_selected.push(skill4)
+      skills_selected.push(skill5)
+      alert(skills_selected);
+    }
+    </script>
+
+
+  </head>
+
+  <body>
+
+
+
+      <div class="container">
+        <form class="form-signin" action="" method="POST">
+        <h2 class="form-signin-heading" align="center">Select your skills</h2>
+
+            {{ form.as_p }}
+            {% csrf_token %}
+
+            <input type="submit" class="btn btn-lg btn-primary btn-block" value="Submit">
+          </form>
+      </div>
+
+
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="https://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
+  </body>
+</html>
