@@ -7,6 +7,7 @@ import os
 from . import forms
 import codecs
 from pathlib import Path
+import time
 
 # Create your views here.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -53,9 +54,6 @@ def form_name_view(request):
 
             print choices_list
 
-            #txt = open(CSV_OUT, "w")
-            #txt.write(choices_list)
-            #txt.close()
 
             out = csv.writer(open("/home/datascience/enron/src/mentee.txt","w"), delimiter=',',quoting=csv.QUOTE_ALL)
             out.writerow(choices_list)
@@ -64,17 +62,15 @@ def form_name_view(request):
 
             my_file = Path('rm /home/datascience/enron/Result/result.csv')
 
-            # i = 0
-            # while (i < 6):
-            #     if my_file.is_file():
-            #         return HttpResponseRedirect('/result')
-            #     else :
-            #         i = i + 1
-            #         print i
-            # return HttpResponseRedirect('/error')
-            return HttpResponseRedirect('/result')
-
-
+            i = 0
+            while (i < 6):
+                if my_file.is_file():
+                    return HttpResponseRedirect('/result')
+                else :
+                    i = i + 1
+                    time.sleep(5)
+                    print i
+            return HttpResponseRedirect('/error')
 
 
     return render(request,'form/selection.html',{'form':form})
