@@ -205,7 +205,7 @@ path_docs = path_global + "/src/docs.csv"
 
 
 
-sqlContext = SQLContext(sc)
+sqlContext = HiveContext(sc)
 emails = sqlContext.read.format("com.databricks.spark.avro").load(path_data)
 
 emails_sent = emails.filter(emails["mailFields"]['FolderName'] == "sent_items")

@@ -1,1 +1,1 @@
-"Marketing","Sales","Techniques","",""
+"trade","option","trade","",""
