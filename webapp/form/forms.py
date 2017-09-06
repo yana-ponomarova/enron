@@ -20,10 +20,11 @@ class FormName(forms.Form):
     #         skills_tuple = (str(i), skill)
     #         choices = choices + (skills_tuple,)
 
-    #CHOICES = (('1', 'First',), ('2', 'Second',))
+    CHOICES = (('1', 'Doc2vec model',), ('2', 'LDA model',))
 
     skill1 = forms.CharField(max_length=50, required=False)
     skill2 = forms.CharField(max_length=50, required=False)
     skill3 = forms.CharField(max_length=50, required=False)
     skill4 = forms.CharField(max_length=50, required=False)
     skill5 = forms.CharField(max_length=50, required=False)
+    model = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect())
