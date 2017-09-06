@@ -32,6 +32,8 @@ from collections import defaultdict
 from random import shuffle
 import datetime
 import gensim
+from gensim import corpora, models
+import gensim
 
 
 # In[7]:
@@ -115,6 +117,7 @@ def acceptable_word(word):
 	accepted = bool(2 <= len(word) <= 12 and word.lower() not in stopwords and re.sub(not_alphabet_regex, " ", word) == word)
 	return accepted
 
+	
 def get_terms(tree):
 	#for leaf in leaves(tree):
 	terms = []
@@ -137,18 +140,11 @@ def PhraseExtractor(message):
 # COMMAND ----------
 
 def prep_text(text):
-        """
-		Cleans text from punctuation and numbers
-		Args:
-				(str) text
-		Returns:
-				(str) cleaned text
-		"""
-		not_alphabet_regex = u"[^a-zA-Z]"
-		cleaned_text = re.sub(not_alphabet_regex, " ", text)
-		cleaned_text_token = nltk.word_tokenize(cleaned_text)
-		cleaned_text_token2 = [normalise(w) for w in cleaned_text_token if acceptable_word(w)]
-		return cleaned_text_token2
+	not_alphabet_regex = u"[^a-zA-Z]"
+	cleaned_text = re.sub(not_alphabet_regex, " ", text)
+	cleaned_text_token = nltk.word_tokenize(cleaned_text)
+	cleaned_text_token2 = [normalise(w) for w in cleaned_text_token if acceptable_word(w)]
+	return cleaned_text_token2
 
 # COMMAND ----------
 
@@ -162,7 +158,6 @@ def decode_idf(vocab, v):
 def decode_vector_vocabulary (vocabulary):
 	vocab = vocabulary
 	def decode_vector( vector):
-	#	vocabulary = CountVectorizerModel.vocabulary
 		vector_decoded = [vocab[v] for v in vector]
 		return (vector_decoded)
 	return decode_vector
@@ -176,7 +171,19 @@ def read_stopwords(path):
                 stopwords.append(word)
     return list(stopwords)
 
-
+def write_lda_model(K, train_set_lda, test_set_lda, dictionary, path_lda_models):
+	ldamodel = gensim.models.ldamodel.LdaModel(train_set_lda, num_topics=K, id2word = dictionary, passes=20)
+	lp = ldamodel.log_perplexity(test_set_lda)
+	topics = ldamodel.show_topics()
+	with open(path_lda_models, "a") as myfile:
+		line = [str(K), str(lp)]
+		for c in range(0, K) :
+			line.append("topic " + str(topics[c][0]) + ": " + topics[c][1])
+		myfile.write("%s\n" % line)
+	
+	myfile.close()
+	return ldamodel
+	
 # In[8]:
 """
 
@@ -190,6 +197,9 @@ path_lastnames = path_global + "/src/CSV_Database_of_Last_Names.csv"
 path_model = path_global + "/Model/doc2vec_model3.txt"
 path_emails_rescaled_byauthor = path_global + "/src/emails_rescaled_byauthor"
 path_docs = path_global + "/src/docs.csv"
+path_emails_rescaled_byauthor = path_global + "/src/emails_rescaled_byauthor"
+path_mentee = path_global + "/src/mentee.txt"
+path_result_lda = path_global + "/Result/result_lda.csv"
 
 """
 path_global = sys.argv[1]
@@ -201,6 +211,9 @@ path_model = path_global + "/Model/doc2vec_model3.txt"
 path_emails_rescaled_byauthor = path_global + "/src/emails_rescaled_byauthor"
 path_docs = path_global + "/src/docs.csv"
 path_lda_models = path_global + "/LDA_models.txt"
+path_mentee = path_global + "/src/mentee.txt"
+path_emails_rescaled_byauthor = path_global + "/src/emails_rescaled_byauthor"
+path_result_lda = path_global + "/Result/result_lda.csv"
 
 
 sqlContext = SQLContext(sc)
@@ -256,20 +269,7 @@ for i in range(0, len(corpus)):
   else:
     train_set_lda.append(corpus[i])
 
-def write_lda_model(K, train_set_lda, test_set_lda, dictionary, path_lda_models):
-	ldamodel = gensim.models.ldamodel.LdaModel(train_set_lda, num_topics=K, id2word = dictionary, passes=20)
-	lp = ldamodel.log_perplexity(test_set_lda)
-	topics = ldamodel.show_topics()
-	with open(path_lda_models, "a") as myfile:
-		line = [str(K), str(lp)]
-		for c in range(0, K) :
-			line.append("topic " + str(topics[c][0]) + ": " + topics[c][1])
-		myfile.write("%s\n" % line)
-	
-	myfile.close()
-	return ldamodel
 
-	
 	
 i = 3  
 while i < 20 :
@@ -277,6 +277,54 @@ while i < 20 :
     i = i + 2   
 	
 	
-path_lda_models.close()
 
+mentee = []
+with open(path_mentee, "r") as file:
+    for line in file:
+        words = line.split(",")
+        words = [re.sub("\n", "", w).strip() for w in words]
+        mentee = mentee + words
+
+file.close()
+
+ldamodel = gensim.models.ldamodel.LdaModel(train_set_lda, num_topics= 15, id2word = dictionary, passes= 20)
+
+
+mentee = [w.lower() for w in mentee]
+mentee_vec = dictionary.doc2bow(mentee)
+mentee_topic_vec = []
+mentee_topic_vec = ldamodel[mentee_vec]
+
+top2_topics_mentee = list(pd.DataFrame(data = mentee_topic_vec, columns=['word', 'weight']).sort_values(["weight"], ascending = False).iloc[:2,0])
+
+similar_emails_mentee = []
+for idx in range(len(corpus)):
+	d = corpus[idx]
+	p = [dict(ldamodel[d]).keys(), top2_topics_mentee]
+	common_topics_d_mentee = set.intersection(*map(set, p))
+	if len(common_topics_d_mentee) > 0 :
+		#similar_emails_mentee.append((idx, {k: dict(ldamodel[d])[k] for k in dict(ldamodel[d]).keys() if k in common_topics_d_mentee}))
+		topic_weight = [(idx, value) for key,value in dict(ldamodel[d]).items() if key in common_topics_d_mentee ]
+		similar_emails_mentee = similar_emails_mentee + topic_weight
+	
+	
+match_list = list(pd.DataFrame(data=similar_emails_mentee, columns=['idx', 'weight']).groupby('idx').agg({'weight':'sum'}).sort_values(["weight"], ascending = False)[:5].index)
+
+author_indx = emails_dedup_cleaned_dedup_chunk.select("from").collect()
+author_match = set([author_indx[a][0] for a in match_list])
+
+emails_rescaled_byauthor = sqlContext.read.format('parquet').load(path_emails_rescaled_byauthor)
+response = emails_rescaled_byauthor.rdd.filter(lambda x : x[0] in author_match)
+
+
+with open(path_result_lda, "a") as myfile:
+    for r in response.collect():
+        features = pd.DataFrame(data=r[1], columns=['word', 'weight']).iloc[:,0].tolist()
+        weights = pd.DataFrame(data=r[1], columns=['word', 'weight']).iloc[:,1].tolist()
+        line0 = [r[0]] +  features + [str(w) for w in weights]
+        line= ",".join(line0)
+        myfile.write("%s\n" % line)
+			
+		
+myfile.close()
 
