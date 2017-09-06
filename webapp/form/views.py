@@ -17,9 +17,6 @@ CSV_OUT = os.path.join(STATIC_DIR, "csv/mentee.txt")
 DATA_RESPONSE = "/home/datascience/enron/Result/result.csv"
 
 
-
-
-
 def index(request):
 
     return render(request,'form/index.html')
@@ -45,6 +42,7 @@ def form_name_view(request):
             choice3 = form.cleaned_data['skill3']
             choice4 = form.cleaned_data['skill4']
             choice5 = form.cleaned_data['skill5']
+            model = form.cleaned_data['model']
             choices_list = []
             choices_list.append(choice1)
             choices_list.append(choice2)
@@ -53,24 +51,41 @@ def form_name_view(request):
             choices_list.append(choice5)
 
             print choices_list
+            print model
 
 
             out = csv.writer(open("/home/datascience/enron/src/mentee.txt","w"), delimiter=',',quoting=csv.QUOTE_ALL)
             out.writerow(choices_list)
             os.system('rm /home/datascience/enron/Result/result.csv')
-            os.system("spark-submit /home/datascience/enron/Code/predict_mentors.py '/home/datascience/enron' '/Data/mail-2015.avro' '/src/stopwords_eng.txt' '/src/CSV_Database_of_First_Names.csv' '/src/CSV_Database_of_Last_Names.csv' --executor-memory 20G")
+            os.system('rm /home/datascience/enron/Result/result_lda.csv')
 
-            my_file = Path('rm /home/datascience/enron/Result/result.csv')
+            if model == 1 :
+                os.system("spark-submit /home/datascience/enron/Code/predict_mentors.py '/home/datascience/enron' '/Data/mail-2015.avro' '/src/stopwords_eng.txt' '/src/CSV_Database_of_First_Names.csv' '/src/CSV_Database_of_Last_Names.csv' --executor-memory 20G")
+                my_file = Path('rm /home/datascience/enron/Result/result.csv')
 
-            i = 0
-            while (i < 6):
-                if my_file.is_file():
-                    return HttpResponseRedirect('/result')
-                else :
-                    i = i + 1
-                    time.sleep(5)
-                    print i
-            return HttpResponseRedirect('/error')
+                i = 0
+                while (i < 6):
+                    if my_file.is_file():
+                        return HttpResponseRedirect('/result')
+                    else :
+                        i = i + 1
+                        time.sleep(5)
+                        print i
+                return HttpResponseRedirect('/error')
+
+            else:
+                os.system("spark-submit /home/datascience/enron/Code/LDA_model.py '/home/datascience/enron' '/Data/mail-2015.avro' '/src/stopwords_eng.txt' '/src/CSV_Database_of_First_Names.csv' '/src/CSV_Database_of_Last_Names.csv' --executor-memory 20G")
+                my_file2 = Path('rm /home/datascience/enron/Result/result_lda.csv')
+
+                i = 0
+                while (i < 6):
+                    if my_file2.is_file():
+                        return HttpResponseRedirect('/result')
+                    else :
+                        i = i + 1
+                        time.sleep(5)
+                        print i
+                return HttpResponseRedirect('/error')
 
 
     return render(request,'form/selection.html',{'form':form})
