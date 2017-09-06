@@ -2,7 +2,8 @@
 # coding: utf-8
 
 # In[2]:
-
+from pyspark import SparkContext
+sc = SparkContext("local", "Simple App")
 from pyspark.sql.types import StringType, ArrayType
 from pyspark.ml.feature import CountVectorizer
 from pyspark.ml.feature import HashingTF, IDF
@@ -10,6 +11,7 @@ from pyspark.sql.functions import udf
 from pyspark.ml.clustering import LDA
 import scipy.sparse as sps
 from pyspark.mllib.linalg import Vectors
+from pyspark.sql import HiveContext
 
 import re
 import numpy as np
@@ -100,8 +102,7 @@ path_result = path_global + "/Result/result.csv"
 
 
 
-sqlContext = SQLContext(sc)
-
+sqlContext = HiveContext(sc)
 
 
 lemmatizer = nltk.WordNetLemmatizer()
@@ -152,7 +153,7 @@ with open(path_docs, "r") as file:
         words = [re.sub("\n", "", w) for w in words]
         docs_read.append(words)
 
-		
+
 file.close()
 
 
@@ -183,7 +184,7 @@ with open(path_result, "a") as myfile:
         line0 = [r[0]] +  features + [str(w) for w in weights]
         line= ",".join(line0)
         myfile.write("%s\n" % line)
-		
-		
-		
+
+
+
 myfile.close()
