@@ -60,7 +60,7 @@ def form_name_view(request):
             out = csv.writer(open("/home/datascience/enron/src/mentee.txt","w"), delimiter=',',quoting=csv.QUOTE_ALL)
             out.writerow(choices_list)
             os.system('rm /home/datascience/enron/Result/result.csv')
-            os.system('spark-submit /home/datascience/enron/Code/predict_mentors.py --executor-memory 20G')
+            os.system("spark-submit /home/datascience/enron/Code/predict_mentors.py '/home/datascience/enron' '/Data/mail-2015.avro' '/src/stopwords_eng.txt' '/src/CSV_Database_of_First_Names.csv' '/src/CSV_Database_of_Last_Names.csv' --executor-memory 20G")
 
             my_file = Path('rm /home/datascience/enron/Result/result.csv')
 
