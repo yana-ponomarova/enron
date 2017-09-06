@@ -12,8 +12,6 @@ The project has the following structure:
 - src : contains project dependencies stopwords and popular first and last names added to the stopwords
 - webapp
 
-Test: use the web-interface here http://193.70.6.96:8000/
-
 In order to run the project:
 Create "Data" folder in the root of the project, put mail-2015.avro there. The avro dataset mail-2015.avro has been obtained from the original Enron enron_mail_20150507.tgz conversion to avro using  https://github.com/medale/spark-mail tutorial.
 
@@ -55,8 +53,7 @@ spark-submit ./Code/LDA_model_main.py <path_global> "/Data/mail-2015.avro"  "/sr
 4) Predic mentors with LDA
 spark-submit ./Code/LDA_model_predict.py <path_global> "/Data/mail-2015.avro"  "/src/stopwords_eng.txt" "/src/CSV_Database_of_First_Names.csv" "/src/CSV_Database_of_Last_Names.csv"
 
-5) If you want to run the webapp, go here http://193.70.6.96:8000/
-or, for a local installation, 
+5) If you want to run the webapp, go for a local installation, 
 -install Django https://docs.djangoproject.com/fr/1.11/topics/install/
 - got to ./webapp
 - run $ python manage.py runserver
