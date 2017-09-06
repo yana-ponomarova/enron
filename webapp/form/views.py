@@ -14,7 +14,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 CSV_DIR = os.path.join(STATIC_DIR, "csv/skills.csv")
 CSV_OUT = os.path.join(STATIC_DIR, "csv/mentee.txt")
-DATA_RESPONSE = "/home/datascience/enron/Result/result.csv"
+
 
 
 def index(request):
@@ -60,7 +60,9 @@ def form_name_view(request):
             #os.system('rm /home/datascience/enron/Result/result_lda.csv')
 
             if model == 1 :
+                DATA_RESPONSE = "/home/datascience/enron/Result/result.csv"
                 os.system("spark-submit --master local[4] /home/datascience/enron/Code/predict_mentors.py '/home/datascience/enron' '/src/stopwords_eng.txt' '/src/CSV_Database_of_First_Names.csv' '/src/CSV_Database_of_Last_Names.csv' '/src/mentee.txt'")
+                time.sleep(60)
                 # my_file = Path('rm /home/datascience/enron/Result/result.csv')
                 # time.sleep(10)
                 # i = 0
@@ -72,10 +74,12 @@ def form_name_view(request):
                 #         time.sleep(2)
                 #         print i
                 # return HttpResponseRedirect('/error')
-                return HttpResponseRedirect('/result')
+                return HttpResponseRedirect('/result_')
 
             else:
-                os.system("spark-submit --master local[4] /home/datascience/enron/Code/LDA_model.py '/home/datascience/enron' '/Data/mail-2015.avro' '/src/stopwords_eng.txt' '/src/CSV_Database_of_First_Names.csv' '/src/CSV_Database_of_Last_Names.csv'")
+                DATA_RESPONSE = "/home/datascience/enron/Result/result_lda.csv"
+                os.system("spark-submit --master local[4] /home/datascience/enron/Code/LDA_model_predict.py '/home/datascience/enron' '/Data/mail-2015.avro' '/src/stopwords_eng.txt' '/src/CSV_Database_of_First_Names.csv' '/src/CSV_Database_of_Last_Names.csv'")
+                time.sleep(60)
                 # my_file2 = Path('rm /home/datascience/enron/Result/result_lda.csv')
                 # time.sleep(10)
                 # i = 0
@@ -94,8 +98,8 @@ def form_name_view(request):
 
 
 def result(request):
-
-    with open(DATA_RESPONSE) as csvfile:
+    print(form_name_view.DATA_RESPONSE)
+    with open(form_name_view.DATA_RESPONSE) as csvfile:
         readCSV = csv.reader(csvfile, delimiter=';')
         mentors = []
         for row in readCSV:
@@ -123,7 +127,7 @@ def result(request):
 
 def result2(request):
 
-    with open(DATA_RESPONSE) as csvfile:
+    with open(form_name_view.DATA_RESPONSE) as csvfile:
         readCSV = csv.reader(csvfile, delimiter=';')
         mentors = []
         for row in readCSV:
@@ -149,7 +153,7 @@ def result2(request):
     return render(request,'form/result2.html',context=dict2)
 
 def result3(request):
-    with open(DATA_RESPONSE) as csvfile:
+    with open(form_name_view.DATA_RESPONSE) as csvfile:
         readCSV = csv.reader(csvfile, delimiter=';')
         mentors = []
         for row in readCSV:
@@ -176,7 +180,7 @@ def result3(request):
 
 def result4(request):
 
-    with open(DATA_RESPONSE) as csvfile:
+    with open(form_name_view.DATA_RESPONSE) as csvfile:
         readCSV = csv.reader(csvfile, delimiter=';')
         mentors = []
         for row in readCSV:
@@ -203,7 +207,7 @@ def result4(request):
 
 def result5(request):
 
-    with open(DATA_RESPONSE) as csvfile:
+    with open(form_name_view.DATA_RESPONSE) as csvfile:
         readCSV = csv.reader(csvfile, delimiter=';')
         mentors = []
         for row in readCSV:
