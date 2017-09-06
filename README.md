@@ -18,8 +18,8 @@ In order to run the project:
 Create "Data" folder in the root of the project, put mail-2015.avro there. The avro dataset mail-2015.avro has been obtained from the original Enron enron_mail_20150507.tgz conversion to avro using  https://github.com/medale/spark-mail tutorial.
 
 Run 
-1) Main model creation
-spark-submit ./Code/PM_doc2vec.py "/home/datascience/enron" "/Data/mail-2015.avro"  "/src/stopwords_eng.txt" "/src/CSV_Database_of_First_Names.csv" "/src/CSV_Database_of_Last_Names.csv"
+1) Main model doc2vec estimation
+spark-submit ./Code/PM_doc2vec.py <path_global> "/Data/mail-2015.avro"  "/src/stopwords_eng.txt" "/src/CSV_Database_of_First_Names.csv" "/src/CSV_Database_of_Last_Names.csv"
 
 Arguments: 
 path_global ()
@@ -34,8 +34,8 @@ path_model = "/Model/doc2vec_model3.txt" - doc2vec model that will be used by me
 path_emails_rescaled_byauthor = '/src/emails_rescaled_byauthor' -Enron employees competencies as vectors, to be used by mentor_predict.py
 path_docs = "/src/docs.csv" -doc2vec model that will be used by mentor_predict.py - corpus restructured, to be used by mentor_predict.py
 
-2) Predic mentors
-spark-submit ./Code/PM_doc2vec.py "/home/datascience/enron" "/Data/mail-2015.avro"  "/src/stopwords_eng.txt" "/src/CSV_Database_of_First_Names.csv" "/src/CSV_Database_of_Last_Names.csv"
+2) Predic mentors with doc2vec
+spark-submit ./Code/PM_doc2vec.py <path_global> "/Data/mail-2015.avro"  "/src/stopwords_eng.txt" "/src/CSV_Database_of_First_Names.csv" "/src/CSV_Database_of_Last_Names.csv"
 
 Arguments: 
 path_global ()
@@ -48,7 +48,14 @@ path_mentee =  "/src/mentee.txt" - relative path to  coma-separated list of ment
 Outputs created 
 path_result = "/Result/result.csv" - file describing top 5 mentors
 
-3) If you want to run the webapp, go here http://193.70.6.96:8000/
+3) Main model LDA estimation 
+Similarly to 1
+spark-submit ./Code/LDA_model_main.py <path_global> "/Data/mail-2015.avro"  "/src/stopwords_eng.txt" "/src/CSV_Database_of_First_Names.csv" "/src/CSV_Database_of_Last_Names.csv"
+
+4) Predic mentors with LDA
+spark-submit ./Code/LDA_model_predict.py <path_global> "/Data/mail-2015.avro"  "/src/stopwords_eng.txt" "/src/CSV_Database_of_First_Names.csv" "/src/CSV_Database_of_Last_Names.csv"
+
+5) If you want to run the webapp, go here http://193.70.6.96:8000/
 or, for a local installation, 
 -install Django https://docs.djangoproject.com/fr/1.11/topics/install/
 - got to ./webapp
