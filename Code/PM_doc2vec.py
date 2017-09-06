@@ -11,6 +11,7 @@ from pyspark.ml.clustering import LDA
 import scipy.sparse as sps
 from pyspark.mllib.linalg import Vectors
 
+import sys, getopt
 import re
 import numpy as np
 import pandas as pd
@@ -37,26 +38,20 @@ import gensim
 # In[7]:
 
 def clean_email(s):
-
 	#This funcion cleans the email extracting the body only
 	#Parameters : s -sting, uncleaned body of email
-
 	email_upperlimit =['Subject:', "X-FileName:"]
 	email_lowerlimit =["----- Forwarded", "-----Original Message", "******************", "=============" ]
-
 	email_upperlimit_pos = [s.find(i) for i in email_upperlimit]
-
 	email_upperlimit_df = pd.DataFrame({'limit': email_upperlimit, 'position': email_upperlimit_pos})
 	email_upperlimit_df = email_upperlimit_df.sort_values(['position'], ascending=False)
 	email_upperlimit_df = email_upperlimit_df.loc[email_upperlimit_df['position'] >= 0]
-
 	email_lowerlimit_pos = [s.find(i) for i in email_lowerlimit]
 	email_lowerlimit2 = [i if i != "******************" else "\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*\*" for i in email_lowerlimit ]
 	email_lowerlimit_df = pd.DataFrame({'limit': email_lowerlimit2, 'position': email_lowerlimit_pos})
 	email_lowerlimit_df = email_lowerlimit_df.sort_values(['position'], ascending=True)
 	email_lowerlimit_df = email_lowerlimit_df.loc[email_lowerlimit_df['position'] >= 0]
 	body3 = ""
-	
 	if (email_upperlimit_df.shape[0] > 0):
 		p1 = re.compile(email_upperlimit_df.iloc[0][0], re.IGNORECASE)
 		if (email_lowerlimit_df.shape[0] > 0):
@@ -128,7 +123,6 @@ def get_terms(tree):
 		term = [normalise(w) for w, t in leaf if acceptable_word(w)]
 		if len(term)> 1 :
 			terms.append(" ".join(term))
-	
 	return terms
 
 def PhraseExtractor(message):
@@ -136,7 +130,6 @@ def PhraseExtractor(message):
 	terms = []
 	for t in trees:
 		terms.append(get_terms(t))	
-	
 	toks = nltk.word_tokenize(message)
 	toks2 = [normalise(t) for t in toks if acceptable_word(t)]
 	terms2 = [t for t in sum(terms, toks2) if t !=""] 
@@ -145,28 +138,22 @@ def PhraseExtractor(message):
 # COMMAND ----------
 
 def prep_text(text):
-		"""
+        """
 		Cleans text from punctuation and numbers
-		
 		Args:
 				(str) text
-		
 		Returns:
 				(str) cleaned text
 		"""
-		
 		not_alphabet_regex = u"[^a-zA-Z]"
 		cleaned_text = re.sub(not_alphabet_regex, " ", text)
 		cleaned_text_token = nltk.word_tokenize(cleaned_text)
 		cleaned_text_token2 = [normalise(w) for w in cleaned_text_token if acceptable_word(w)]
-			
 		return cleaned_text_token2
 
 # COMMAND ----------
 
 def decode_idf(vocab, v):
-	 # v2 = v[0].toArray()
-	 # v3 = [(vocab[i], v[0].toArray()[i]) for i in range(0,len(v[0].toArray())) if v[0].toArray()[i] > 0]
 		v2 = v.toArray()
 		v3 = [(vocab[i], v.toArray()[i]) for i in range(0,len(v.toArray())) if v.toArray()[i] > 0]
 		return v3
@@ -192,36 +179,49 @@ def read_stopwords(path):
 
 
 # In[8]:
+"""
+
+spark-submit ./Code/PM_doc2vec.py "/home/datascience/enron" "/Data/mail-2015.avro"  "/src/stopwords_eng.txt" "/src/CSV_Database_of_First_Names.csv" "/src/CSV_Database_of_Last_Names.csv"
+
+path_global = "/home/datascience/enron"
+path_data = path_global + "/Data/mail-2015.avro"
+path_stopwords = path_global + "/src/stopwords_eng.txt"
+path_firstnames = path_global + "/src/CSV_Database_of_First_Names.csv"
+path_lastnames = path_global + "/src/CSV_Database_of_Last_Names.csv"
+path_model = path_global + "/Model/doc2vec_model3.txt"
+path_emails_rescaled_byauthor = path_global + "/src/emails_rescaled_byauthor"
+path_docs = path_global + "/src/docs.csv"
+
+"""
+path_global = sys.argv[1]
+
+path_data = path_global + sys.argv[2]
+path_stopwords = path_global + sys.argv[3]
+path_firstnames = path_global + sys.argv[4]
+path_lastnames = path_global + sys.argv[5]
+path_model = path_global + "/Model/doc2vec_model3.txt"
+path_emails_rescaled_byauthor = path_global + "/src/emails_rescaled_byauthor"
+path_docs = path_global + "/src/docs.csv"
+
+
 
 sqlContext = SQLContext(sc)
-emails = sqlContext.read.format("com.databricks.spark.avro").load("/home/datascience/enron/Data/mail-2015.avro")
-
-
-# In[11]:
+emails = sqlContext.read.format("com.databricks.spark.avro").load(path_data)
 
 emails_sent = emails.filter(emails["mailFields"]['FolderName'] == "sent_items")
-
-# COMMAND ----------
-
 emails_dedup = emails_sent.dropDuplicates(['from', 'body'])
-
-# COMMAND ----------
 
 udf_myFunction = udf(clean_email, StringType()) 
 emails_dedup_cleaned = emails_dedup.withColumn("body_cleaned", udf_myFunction("body")) #"_3" being the column name of the column you want to consider
 emails_dedup_cleaned_dedup = emails_dedup_cleaned.dropDuplicates(['from', 'body_cleaned'])
 
-# COMMAND ----------
 
-#stopwords = stopwords.words('english')
-stopwords1 = read_stopwords("/home/datascience/enron/src/stopwords_eng.txt")
-
-first_name = read_stopwords("/home/datascience/enron/src/CSV_Database_of_First_Names.csv")
-last_name = read_stopwords("/home/datascience/enron/src/CSV_Database_of_Last_Names.csv")
+stopwords1 = read_stopwords(path_stopwords)
+first_name = read_stopwords(path_firstnames)
+last_name = read_stopwords(path_lastnames)
 
 stopwords = stopwords1  + first_name + last_name
 stopwords = [s.lower() for s in stopwords]
-
 
 grammar = r"""
  NBAR:
@@ -236,10 +236,6 @@ grammar = r"""
 """
 lemmatizer = nltk.WordNetLemmatizer()
 stemmer = nltk.stem.porter.PorterStemmer()
-
-# COMMAND ----------
-
-len(stopwords)
 
 # COMMAND ----------
 
@@ -269,6 +265,8 @@ analyzedDocument = namedtuple('analyzedDocument', 'words tags')
 
 for i in range(0, len(docs)):
 	Doc2Vec_documents.append(analyzedDocument(docs[i][0], str(i)))
+    
+    
 doc_list = Doc2Vec_documents[:] # For reshuffling per pass
 
 
@@ -304,7 +302,6 @@ for name, train_model in models_by_name.items():
 	train_model.alpha, train_model.min_alpha = alpha, alpha
 	train_model.train(doc_list, total_examples=len(doc_list), epochs=50)
 	models_by_name[name] = train_model
-	
 	print ("Model " + name)
 	#Test 1 
 	str_pos = 'ga'
@@ -317,16 +314,12 @@ for name, train_model in models_by_name.items():
 	print("most similar to " + str_pos + " and least similar to " + str_neg )
 	print(train_model.most_similar(positive=['energi'], negative=['trade'], topn=10))
 	print ("\n")
-	
 	print("most similar to " + str_pos + " and " + str_neg )
 	print(train_model.most_similar(positive=[str_pos, str_neg], topn=10))
 	print ("\n")
-	
-
 	#Test 3 : Sanity Check
 	rome_str = ['rome', 'italy']
 	car_str = ['car']
-	
 	bool = train_model.docvecs.similarity_unseen_docs(train_model, rome_str, rome_str) > train_model.docvecs.similarity_unseen_docs(train_model, rome_str, car_str)
 	print ("Sanity check " + str(bool))
 	print ("\n\n\n")
@@ -336,7 +329,7 @@ for name, train_model in models_by_name.items():
 
 # In[17]:
 
-models_by_name['Doc2Vec(dm/m,d100,n5,w10,mc2,s0.001,t8)'].save('/home/datascience/enron/Model/doc2vec_model3.txt')
+models_by_name['Doc2Vec(dm/m,d100,n5,w10,mc2,s0.001,t8)'].save(path_model)
 
 
 # In[25]:
@@ -348,16 +341,18 @@ emails_rescaled_byauthor = emails_rescaled_decoded.reduceByKey(lambda a, b : a+b
 
 # In[27]:
 
-emails_rescaled_byauthor.write.save('/home/datascience/enron/src/emails_rescaled_byauthor', format='parquet', mode='overwrite')
+emails_rescaled_byauthor.write.save(path_emails_rescaled_byauthor, format='parquet', mode='overwrite')
 
 
 # In[ ]:
 
 docs2 = [d[0] for d in docs]
-path = "/home/datascience/enron/src/docs.csv"
-with open(path, "a") as myfile:
+
+with open(path_docs, "a") as myfile:
     for d in docs2:
         line = ",".join(d)
         myfile.write("%s\n" % line)
+
+        
 myfile.close()
 
