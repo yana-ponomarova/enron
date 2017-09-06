@@ -60,7 +60,7 @@ def form_name_view(request):
             os.system('rm /home/datascience/enron/Result/result_lda.csv')
 
             if model == 1 :
-                os.system("spark-submit /home/datascience/enron/Code/predict_mentors.py '/home/datascience/enron' '/Data/mail-2015.avro' '/src/stopwords_eng.txt' '/src/CSV_Database_of_First_Names.csv' '/src/CSV_Database_of_Last_Names.csv' --executor-memory 20G")
+                os.system("spark-submit --master local[4] /home/datascience/enron/Code/predict_mentors.py '/home/datascience/enron' '/src/stopwords_eng.txt' '/src/CSV_Database_of_First_Names.csv' '/src/CSV_Database_of_Last_Names.csv' '/src/mentee.txt'")
                 my_file = Path('rm /home/datascience/enron/Result/result.csv')
 
                 i = 0
@@ -74,7 +74,7 @@ def form_name_view(request):
                 return HttpResponseRedirect('/error')
 
             else:
-                os.system("spark-submit /home/datascience/enron/Code/LDA_model.py '/home/datascience/enron' '/Data/mail-2015.avro' '/src/stopwords_eng.txt' '/src/CSV_Database_of_First_Names.csv' '/src/CSV_Database_of_Last_Names.csv' --executor-memory 20G")
+                os.system("spark-submit --master local[4] /home/datascience/enron/Code/LDA_model.py '/home/datascience/enron' '/Data/mail-2015.avro' '/src/stopwords_eng.txt' '/src/CSV_Database_of_First_Names.csv' '/src/CSV_Database_of_Last_Names.csv'")
                 my_file2 = Path('rm /home/datascience/enron/Result/result_lda.csv')
 
                 i = 0
