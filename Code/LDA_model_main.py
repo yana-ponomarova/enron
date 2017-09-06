@@ -2,6 +2,9 @@
 
 # In[15]:
 
+
+from pyspark import SparkContext
+sc = SparkContext("local", "Simple App")
 from pyspark.sql.types import StringType, ArrayType
 from pyspark.ml.feature import CountVectorizer
 from pyspark.ml.feature import HashingTF, IDF
@@ -9,6 +12,7 @@ from pyspark.sql.functions import udf
 from pyspark.ml.clustering import LDA
 import scipy.sparse as sps
 from pyspark.mllib.linalg import Vectors
+from pyspark.sql import HiveContext
 
 import sys, getopt
 import re

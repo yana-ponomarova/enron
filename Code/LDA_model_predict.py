@@ -2,6 +2,9 @@
 
 # In[15]:
 
+
+from pyspark import SparkContext
+sc = SparkContext("local", "Simple App")
 from pyspark.sql.types import StringType, ArrayType
 from pyspark.ml.feature import CountVectorizer
 from pyspark.ml.feature import HashingTF, IDF
@@ -9,7 +12,7 @@ from pyspark.sql.functions import udf
 from pyspark.ml.clustering import LDA
 import scipy.sparse as sps
 from pyspark.mllib.linalg import Vectors
-
+from pyspark.sql import HiveContext
 import sys, getopt
 import re
 import numpy as np
@@ -34,7 +37,6 @@ import datetime
 import gensim
 from gensim import corpora, models
 import gensim
-
 
 # In[7]:
 
@@ -187,7 +189,7 @@ def write_lda_model(K, train_set_lda, test_set_lda, dictionary, path_lda_models)
 # In[8]:
 """
 
-spark-submit ./Code/PM_doc2vec.py "/home/datascience/enron" "/Data/mail-2015.avro"  "/src/stopwords_eng.txt" "/src/CSV_Database_of_First_Names.csv" "/src/CSV_Database_of_Last_Names.csv"
+spark-submit ./Code/LDA_model_predict.py "/home/datascience/enron" "/Data/mail-2015.avro"  "/src/stopwords_eng.txt" "/src/CSV_Database_of_First_Names.csv" "/src/CSV_Database_of_Last_Names.csv"
 
 path_global = "/home/datascience/enron"
 path_data = path_global + "/Data/mail-2015.avro"
@@ -223,6 +225,8 @@ path_ldamodel = path_global + "/Model/lda_model13.txt"
 path_lda_dictionary = path_global + "/src/path_lda_dictionary.dic"
 path_lda_corpora = path_global + '/src/path_lda_corpora.mm'
 path_id_from = path_global + '/src/path_id_from.csv'
+
+sqlContext = HiveContext(sc)
 
 
 stopwords1 = read_stopwords(path_stopwords)
@@ -269,7 +273,7 @@ id_from = pd.DataFrame(data=id_from, columns=['id', 'from'])
 	
 
 
-ldamode = models.ldamodel.LdaModel.load(path_ldamodel)
+ldamodel = models.ldamodel.LdaModel.load(path_ldamodel)
 dictionary = corpora.Dictionary.load(path_lda_dictionary)
 corpus = corpora.MmCorpus(path_lda_corpora)
 
