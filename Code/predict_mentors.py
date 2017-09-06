@@ -138,6 +138,9 @@ with open(path_mentee, "r") as file:
         words = line.split(",")
         words = [re.sub("\n", "", w).strip() for w in words]
         mentee = mentee + words
+		
+		
+		
 file.close()
 
 
