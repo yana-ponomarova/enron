@@ -143,7 +143,7 @@ file.close()
 
 # In[105]:
 
-mentee = [w.lower() for w in mentee]
+mentee = [w.lower().replace('"', '').strip() for w in mentee if len(w) > 2]
 
 
 docs_read = []
