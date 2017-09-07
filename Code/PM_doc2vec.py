@@ -35,6 +35,7 @@ from collections import defaultdict
 from random import shuffle
 import datetime
 import gensim
+import os
 
 
 # In[7]:

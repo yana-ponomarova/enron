@@ -38,6 +38,7 @@ import datetime
 import gensim
 from gensim import corpora, models
 import gensim
+import os
 
 
 # In[7]:

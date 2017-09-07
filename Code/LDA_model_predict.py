@@ -37,6 +37,8 @@ import datetime
 import gensim
 from gensim import corpora, models
 import gensim
+import os
+
 
 # In[7]:
 
@@ -261,17 +263,7 @@ with open(path_mentee, "r") as file:
 
 file.close()
 
-id_from = []
-with open(path_id_from, "r") as file:
-	for line in file:
-		line.replace('"', '').strip()
-		words = line.split(",")
-		id_from.append(words)
-		
-file.close()
-id_from = pd.DataFrame(data=id_from, columns=['id', 'from'])
-	
-
+id_from = pd.read_table(path_id_from, sep=",", header = None, names = ['id', 'from'])
 
 ldamodel = models.ldamodel.LdaModel.load(path_ldamodel)
 dictionary = corpora.Dictionary.load(path_lda_dictionary)
@@ -295,9 +287,8 @@ for idx in range(len(corpus)):
 		similar_emails_mentee = similar_emails_mentee + topic_weight
 		
 	
-	
 match_list = list(pd.DataFrame(data=similar_emails_mentee, columns=['idx', 'weight']).groupby('idx').agg({'weight':'sum'}).sort_values(["weight"], ascending = False)[:5].index)
-author_match = set([id_from.ix[id_from['id']==str(a), 1].iloc[0] for a in match_list])
+author_match = set([id_from.ix[id_from['id'] == a, 1].iloc[0] for a in match_list])
 
 emails_rescaled_byauthor = sqlContext.read.format('parquet').load(path_emails_rescaled_byauthor)
 response = emails_rescaled_byauthor.rdd.filter(lambda x : x[0] in author_match)

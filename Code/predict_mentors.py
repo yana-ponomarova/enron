@@ -36,6 +36,7 @@ import datetime
 import gensim
 import sys, getopt
 
+import os
 
 
 
@@ -177,8 +178,10 @@ responce_indices = solution_df.index[range(0,t)]
 
 response = emails_rescaled_byauthor.rdd.filter(lambda x : x[0] in list(responce_indices))
 
-
-# In[93]:
+try:
+	os.remove(path_result)
+except OSError:
+	pass
 
 with open(path_result, "a") as myfile:
     for r in response.collect():
