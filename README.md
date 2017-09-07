@@ -33,11 +33,10 @@ path_emails_rescaled_byauthor = '/src/emails_rescaled_byauthor' -Enron employees
 path_docs = "/src/docs.csv" -doc2vec model that will be used by mentor_predict.py - corpus restructured, to be used by mentor_predict.py
 
 2) Predic mentors with doc2vec
-spark-submit ./Code/PM_doc2vec.py <path_global> "/Data/mail-2015.avro"  "/src/stopwords_eng.txt" "/src/CSV_Database_of_First_Names.csv" "/src/CSV_Database_of_Last_Names.csv"
+spark-submit ./Code/PM_doc2vec.py <path_global>  "/src/stopwords_eng.txt" "/src/CSV_Database_of_First_Names.csv" "/src/CSV_Database_of_Last_Names.csv"
 
 Arguments: 
 path_global ()
-path_data = "/Data/mail-2015.avro" - relative path to the avro datasource
 path_stopwords = "/src/stopwords_eng.txt" - relative path to stopwords file
 path_firstnames = "/src/CSV_Database_of_First_Names.csv" - relative path to first names file
 path_lastnames = "/src/CSV_Database_of_Last_Names.csv" - relative path to last names file
@@ -51,7 +50,7 @@ Similarly to 1
 spark-submit ./Code/LDA_model_main.py <path_global> "/Data/mail-2015.avro"  "/src/stopwords_eng.txt" "/src/CSV_Database_of_First_Names.csv" "/src/CSV_Database_of_Last_Names.csv"
 
 4) Predic mentors with LDA
-spark-submit ./Code/LDA_model_predict.py <path_global> "/Data/mail-2015.avro"  "/src/stopwords_eng.txt" "/src/CSV_Database_of_First_Names.csv" "/src/CSV_Database_of_Last_Names.csv"
+spark-submit ./Code/LDA_model_predict.py <path_global> "/src/stopwords_eng.txt" "/src/CSV_Database_of_First_Names.csv" "/src/CSV_Database_of_Last_Names.csv"
 
 5) If you want to run the webapp, go for a local installation, 
 -install Django https://docs.djangoproject.com/fr/1.11/topics/install/
