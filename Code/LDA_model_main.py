@@ -178,7 +178,7 @@ def read_stopwords(path):
 def write_lda_model(K, train_set_lda, test_set_lda, dictionary, path_lda_models):
 	ldamodel = gensim.models.ldamodel.LdaModel(train_set_lda, num_topics=K, id2word = dictionary, passes=20)
 	lp = ldamodel.log_perplexity(test_set_lda)
-	topics = ldamodel.show_topics()
+	topics = ldamodel.show_topics(num_topics = K)
 	with open(path_lda_models, "a") as myfile:
 		line = [str(K), str(lp)]
 		for c in range(0, K) :
