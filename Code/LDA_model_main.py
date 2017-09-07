@@ -215,6 +215,7 @@ path_data = path_global + sys.argv[2]
 path_stopwords = path_global + sys.argv[3]
 path_firstnames = path_global + sys.argv[4]
 path_lastnames = path_global + sys.argv[5]
+
 path_model = path_global + "/Model/doc2vec_model3.txt"
 path_emails_rescaled_byauthor = path_global + "/src/emails_rescaled_byauthor"
 path_docs = path_global + "/src/docs.csv"
@@ -226,6 +227,11 @@ path_ldamodel = path_global + "/Model/lda_model13.txt"
 path_lda_dictionary = path_global + "/src/path_lda_dictionary.dic"
 path_lda_corpora = path_global + '/src/path_lda_corpora.mm'
 path_id_from = path_global + '/src/path_id_from.csv'
+
+
+
+
+
 
 
 sqlContext = HiveContext(sc)
@@ -282,7 +288,11 @@ for i in range(0, len(corpus)):
     train_set_lda.append(corpus[i])
 
 
-	
+try:
+	os.remove(train_set_lda)
+except OSError:
+	pass
+
 i = 3  
 while i < 20 :
     write_lda_model(i, train_set_lda, test_set_lda, dictionary, path_lda_models_test)    
@@ -298,6 +308,11 @@ emails_dedup_cleaned_dedup_chunk_collect = emails_dedup_cleaned_dedup_chunk.sele
 id_from = [[str(i), emails_dedup_cleaned_dedup_chunk_collect[i][0] ] for i in range(0, len(emails_dedup_cleaned_dedup_chunk_collect))]
    
 
+try:
+	os.remove(path_id_from)
+except OSError:
+	pass
+   
 with open(path_id_from, "a") as myfile:
 	for c in id_from :
 		line = ",".join(c)

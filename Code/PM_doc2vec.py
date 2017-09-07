@@ -334,6 +334,11 @@ emails_rescaled_byauthor.write.save(path_emails_rescaled_byauthor, format='parqu
 
 docs2 = [d[0] for d in docs]
 
+try:
+	os.remove(path_docs)
+except OSError:
+	pass
+	
 with open(path_docs, "a") as myfile:
     for d in docs2:
         line = ",".join(d)

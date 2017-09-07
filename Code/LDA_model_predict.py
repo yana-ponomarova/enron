@@ -302,6 +302,11 @@ author_match = set([id_from.ix[id_from['id']==str(a), 1].iloc[0] for a in match_
 emails_rescaled_byauthor = sqlContext.read.format('parquet').load(path_emails_rescaled_byauthor)
 response = emails_rescaled_byauthor.rdd.filter(lambda x : x[0] in author_match)
 
+try:
+	os.remove(path_result_lda)
+except OSError:
+	pass
+
 with open(path_result_lda, "a") as myfile:
     for r in response.collect():
         features = pd.DataFrame(data=r[1], columns=['word', 'weight']).iloc[:,0].tolist()
