@@ -274,7 +274,12 @@ mentee_vec = dictionary.doc2bow(mentee)
 mentee_topic_vec = []
 mentee_topic_vec = ldamodel[mentee_vec]
 
-top2_topics_mentee = list(pd.DataFrame(data = mentee_topic_vec, columns=['word', 'weight']).sort_values(["weight"], ascending = False).iloc[:2,0])
+#ntopics = 1
+#top2_topics_mentee = list(pd.DataFrame(data = mentee_topic_vec, columns=['word', 'weight']).sort_values(["weight"], ascending = False).iloc[:ntopics,0])
+
+top2_topics_mentee_df = pd.DataFrame(data = mentee_topic_vec, columns=['word', 'weight']).sort_values(["weight"], ascending = False)
+top2_topics_mentee = list(top2_topics_mentee_df.loc[top2_topics_mentee_df['weight']>0.5].ix[:,0])
+
 
 similar_emails_mentee = []
 for idx in range(len(corpus)):
@@ -285,29 +290,29 @@ for idx in range(len(corpus)):
 		#similar_emails_mentee.append((idx, {k: dict(ldamodel[d])[k] for k in dict(ldamodel[d]).keys() if k in common_topics_d_mentee}))
 		topic_weight = [(idx, value) for key,value in dict(ldamodel[d]).items() if key in common_topics_d_mentee ]
 		similar_emails_mentee = similar_emails_mentee + topic_weight
-		
-	
-match_list = list(pd.DataFrame(data=similar_emails_mentee, columns=['idx', 'weight']).groupby('idx').agg({'weight':'sum'}).sort_values(["weight"], ascending = False)[:5].index)
-author_match = set([id_from.ix[id_from['id'] == a, 1].iloc[0] for a in match_list])
 
-emails_rescaled_byauthor = sqlContext.read.format('parquet').load(path_emails_rescaled_byauthor)
-response = emails_rescaled_byauthor.rdd.filter(lambda x : x[0] in author_match)
+if len(similar_emails_mentee) > 0:
+	match_list = list(pd.DataFrame(data=similar_emails_mentee, columns=['idx', 'weight']).groupby('idx').agg({'weight':'sum'}).sort_values(["weight"], ascending = False)[:5].index)
+	author_match = set([id_from.ix[id_from['id'] == a, 1].iloc[0] for a in match_list])
 
-try:
-	os.remove(path_result_lda)
-except OSError:
-	pass
+	emails_rescaled_byauthor = sqlContext.read.format('parquet').load(path_emails_rescaled_byauthor)
+	response = emails_rescaled_byauthor.rdd.filter(lambda x : x[0] in author_match)
 
-with open(path_result_lda, "a") as myfile:
-    for r in response.collect():
-        features = pd.DataFrame(data=r[1], columns=['word', 'weight']).iloc[:,0].tolist()
-        weights = pd.DataFrame(data=r[1], columns=['word', 'weight']).iloc[:,1].tolist()
-        line0 = [r[0]] +  features + [str(w) for w in weights]
-        line= ",".join(line0)
-        myfile.write("%s\n" % line)
+	try:
+		os.remove(path_result_lda)
+	except OSError:
+		pass
+
+	with open(path_result_lda, "a") as myfile:
+		for r in response.collect():
+			features = pd.DataFrame(data=r[1], columns=['word', 'weight']).iloc[:,0].tolist()
+			weights = pd.DataFrame(data=r[1], columns=['word', 'weight']).iloc[:,1].tolist()
+			line0 = [r[0]] +  features + [str(w) for w in weights]
+			line= ",".join(line0)
+			myfile.write("%s\n" % line)
+				
 			
-		
-myfile.close()
+	myfile.close()
 
 
 

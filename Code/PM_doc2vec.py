@@ -262,11 +262,11 @@ assert gensim.models.doc2vec.FAST_VERSION > -1, "Speed enhansement"
 
 simple_models = [
 		# PV-DM w/ concatenation - window=5 (both sides) approximates paper's 10-word total window size
-		Doc2Vec(dm=1, dm_concat=1, size=100, window=5, negative=5, hs=0, min_count=2, workers=cores),
+		Doc2Vec(dm=1, dm_concat=1, size=100, window=5, negative=0, hs=1, min_count=2, workers=cores),
 		# PV-DBOW 
-		Doc2Vec(dm=0, size=100, negative=5, hs=0, min_count=2, workers=cores),
+		Doc2Vec(dm=0, size=100, negative=0, hs=1, min_count=2, workers=cores),
 		# PV-DM w/ average
-		Doc2Vec(dm=1, dm_mean=1, size=100, window=10, negative=5, hs=0, min_count=2, workers=cores),
+		Doc2Vec(dm=1, dm_mean=1, size=100, window=10, negative=0, hs=1, min_count=2, workers=cores),
 ]	
 	
 simple_models[0].build_vocab(Doc2Vec_documents) # PV-DM w/ concat requires one special NULL word so it serves as template

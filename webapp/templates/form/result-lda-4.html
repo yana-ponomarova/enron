@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="https://getbootstrap.com/favicon.ico">
+
+    <title>Signin Template for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="https://getbootstrap.com/docs/4.0/examples/signin/signin.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <div class="site-wrapper">
+
+      <div class="site-wrapper-inner">
+
+        <div class="cover-container">
+
+        <div class="container">
+
+
+            <h2 class="form-signin-heading" align="center">Here are the best mentors for you!</h2>
+            </br>
+            <div class="container">
+            <h2>{{ mentor4_name }}</h2>
+            <p>4/5</p>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Skills</th>
+                  <th>Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{{ mentor4_skill1 }}</td>
+                  <td>{{ mentor4_score1 }}</td>
+                </tr>
+                <tr>
+                  <td>{{ mentor4_skill2 }}</td>
+                  <td>{{ mentor4_score2 }}</td>
+                </tr>
+                <tr>
+                  <td>{{ mentor4_skill3 }}</td>
+                  <td>{{ mentor4_score3 }}</td>
+                </tr>
+                <tr>
+                  <td>{{ mentor4_skill4 }}</td>
+                  <td>{{ mentor4_score4 }}</td>
+                </tr>
+                <tr>
+                  <td>{{ mentor4_skill5 }}</td>
+                  <td>{{ mentor4_score5 }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+
+          </br>
+          <div class="container" align="center">
+              <form class="" action="index.html" method="post">
+                <a href="/result-lda-3/" class="btn btn-lg btn-secondary" >Previous</a>
+                <a href="/result-lda-5/" class="btn btn-lg btn-secondary" >Next</a>
+                </form>
+            </div>
+
+        </div> <!-- /container -->
+</div>
+</div>
+</div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="https://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
+  </body>
+</html>

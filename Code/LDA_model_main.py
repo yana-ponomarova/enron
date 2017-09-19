@@ -289,11 +289,6 @@ for i in range(0, len(corpus)):
     train_set_lda.append(corpus[i])
 
 
-try:
-	os.remove(train_set_lda)
-except OSError:
-	pass
-
 i = 3  
 while i < 20 :
     write_lda_model(i, train_set_lda, test_set_lda, dictionary, path_lda_models_test)    
